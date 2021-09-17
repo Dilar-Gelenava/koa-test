@@ -11,7 +11,6 @@ const url =
 
 async function init() {
     client = await connect(url, { useUnifiedTopology: true });
-    console.log(client);
 
     return client;
 }

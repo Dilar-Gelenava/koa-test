@@ -1,12 +1,33 @@
 import mongo from '../service/mongo.js';
-const db = mongo.getClient();
+import { ObjectId } from 'mongodb';
 
-const collection = db.db('test').collection('movie');
+const getCollection = () => {
+    const db = mongo.getClient();
+    const collection = db.db('test').collection('movie');
 
-async function createMovie(body) {
-    const { insertedId } = await collection.insertOne(body);
+    return collection;
+};
 
-    return insertedId;
-}
+const createMovie = async (body) => {
+    await getCollection().insertOne(body);
+};
 
-export default { createMovie };
+const getMovies = async () => {
+    const movies = await getCollection().find().toArray();
+    return movies;
+};
+
+const getMovie = async (id) => {
+    const movie = await getCollection().findOne({ _id: new ObjectId(id) });
+    return movie;
+};
+
+const removeMovie = async (id) => {
+    await getCollection().deleteOne({ _id: new ObjectId(id) });
+};
+
+const updateMovie = async (id, body) => {
+    await getCollection().updateOne({ _id: new ObjectId(id) }, { $set: body });
+};
+
+export default { createMovie, getMovies, getMovie, removeMovie, updateMovie };

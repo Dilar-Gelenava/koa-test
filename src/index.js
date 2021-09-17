@@ -1,9 +1,10 @@
-import server from './server.js';
 import mongo from './service/mongo.js';
+import server from './server.js';
 
 const run = async () => {
     try {
         await mongo.init();
+
         await server.run();
     } catch (err) {
         logger.error(`Can't start the service: ${err.message}`);
