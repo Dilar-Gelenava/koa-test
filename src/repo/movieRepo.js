@@ -9,7 +9,8 @@ const getCollection = () => {
 };
 
 const createMovie = async (body) => {
-    await getCollection().insertOne(body);
+    const { insertedId } = await getCollection().insertOne(body);
+    return insertedId;
 };
 
 const getMovies = async () => {

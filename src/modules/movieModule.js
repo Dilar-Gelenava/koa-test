@@ -1,24 +1,27 @@
 import movieRepo from '../repo/movieRepo.js';
+import movieSchema from '../schema/movieSchema.js';
+import Joi from 'joi';
 
 const create = async (ctx) => {
-    const { title, year, description } = ctx.request.body;
-    const movie = {
-        title,
-        year,
-        description,
-    };
-    movieRepo.createMovie(movie);
+    const { value, error } = movieSchema.validate(ctx.request.body);
+    if (error) {
+        ctx.status = 400;
+        return (ctx.body = error.details);
+    }
+
+    const insertedId = await movieRepo.createMovie(value);
     return (ctx.body = {
         success: true,
+        id: insertedId,
     });
 };
 
 const list = async (ctx) => {
-    ctx.body = await movieRepo.getMovies();
+    return (ctx.body = await movieRepo.getMovies());
 };
 
 const show = async (ctx) => {
-    ctx.body = await movieRepo.getMovie(ctx.params.id);
+    return (ctx.body = await movieRepo.getMovie(ctx.params.id));
 };
 
 const remove = async (ctx) => {
@@ -29,7 +32,15 @@ const remove = async (ctx) => {
 };
 
 const update = async (ctx) => {
-    movieRepo.updateMovie(ctx.params.id, ctx.request.body);
+    const schema = movieSchema.optional();
+    const { value, error } = schema.validate(ctx.request.body);
+
+    if (error) {
+        ctx.status = 400;
+        return (ctx.body = error.details);
+    }
+
+    movieRepo.updateMovie(ctx.params.id, value);
     return (ctx.body = {
         success: true,
     });
