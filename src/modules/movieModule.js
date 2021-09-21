@@ -32,8 +32,7 @@ const remove = async (ctx) => {
 };
 
 const update = async (ctx) => {
-    const schema = movieSchema.optional();
-    const { value, error } = schema.validate(ctx.request.body);
+    const { value, error } = movieSchema.validate(ctx.request.body);
 
     if (error) {
         ctx.status = 400;
