@@ -1,6 +1,5 @@
 import movieRepo from '../repo/movieRepo.js';
 import movieSchema from '../schema/movieSchema.js';
-import Joi from 'joi';
 
 const create = async (ctx) => {
     const { value, error } = movieSchema.validate(ctx.request.body);

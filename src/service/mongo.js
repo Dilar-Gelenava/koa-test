@@ -23,6 +23,13 @@ function getClient() {
     return client;
 }
 
+const getCollection = (db_name, coll_name) => {
+    const db = getClient();
+    const collection = db.db(db_name).collection(coll_name);
+
+    return collection;
+};
+
 function close() {
     client.close();
 }
@@ -30,5 +37,6 @@ function close() {
 export default {
     init,
     getClient,
+    getCollection,
     close,
 };
