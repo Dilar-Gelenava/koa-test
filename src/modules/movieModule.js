@@ -1,12 +1,15 @@
 import movieRepo from '../repo/movieRepo.js';
+import commentRepo from '../repo/commentRepo.js';
 import movieSchema from '../schema/movieSchema.js';
 
 const create = async (ctx) => {
     const { value, error } = movieSchema.validate(ctx.request.body);
     if (error) {
         ctx.status = 400;
-        return (ctx.body = error.details);
+        return (ctx.body = error.details[0].message);
     }
+
+    value.userId = 1;
 
     const insertedId = await movieRepo.createMovie(value);
     return (ctx.body = {
@@ -24,7 +27,8 @@ const show = async (ctx) => {
 };
 
 const remove = async (ctx) => {
-    movieRepo.removeMovie(ctx.params.id);
+    await commentRepo.removeMovieComments(ctx.params.id);
+    await movieRepo.removeMovie(ctx.params.id);
     return (ctx.body = {
         success: true,
     });

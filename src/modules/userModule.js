@@ -37,7 +37,7 @@ const login = async (ctx) => {
     }
 };
 
-function verifyToken(ctx, next) {
+const verifyToken = async (ctx, next) => {
     const bearerHeader = ctx.request.headers['authorization'];
 
     if (typeof bearerHeader !== 'undefined') {
@@ -64,8 +64,9 @@ function verifyToken(ctx, next) {
         ctx.status = 401;
         return (ctx.body = {
             success: false,
+            message: 'you are not authorized!',
         });
     }
-}
+};
 
 export default { register, login, verifyToken };
