@@ -1,17 +1,19 @@
 import Router from 'koa-router';
-const router = new Router();
 import movieModule from '../modules/movieModule.js';
+const router = new Router({
+    prefix: '/api',
+});
 
-router.get('/movies', movieModule.list);
+router.get('/movie/list', movieModule.list);
 
 router.post('/movie/new', movieModule.create);
 
 router.get('/movie/:id', movieModule.show);
 
-router.get('/movie/delete/:id', movieModule.remove);
+router.delete('/movie/delete/:id', movieModule.remove);
 
-// router.get('/movie/edit/:id',movieModule.edit);
+router.put('/movie/update/:id', movieModule.update);
 
-router.post('/movie/update/:id', movieModule.update);
+router.get('/movie/search/:title', movieModule.search);
 
 export default router.routes();

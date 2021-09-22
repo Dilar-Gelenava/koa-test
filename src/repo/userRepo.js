@@ -1,6 +1,5 @@
 import bcrypt from 'bcrypt';
 import mongo from '../service/mongo.js';
-import { ObjectId } from 'mongodb';
 const getCollection = mongo.getCollection;
 
 const createUser = async (body) => {

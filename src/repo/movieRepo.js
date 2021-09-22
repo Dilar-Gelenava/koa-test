@@ -30,4 +30,18 @@ const updateMovie = async (id, body) => {
     );
 };
 
-export default { createMovie, getMovies, getMovie, removeMovie, updateMovie };
+const searchMovie = async (title) => {
+    const movies = await getCollection('test', 'movie')
+        .find({ title: { $regex: `.*${title}.*`, $options: 'i' } })
+        .toArray();
+    return movies;
+};
+
+export default {
+    createMovie,
+    getMovies,
+    getMovie,
+    removeMovie,
+    updateMovie,
+    searchMovie,
+};

@@ -44,4 +44,8 @@ const update = async (ctx) => {
     });
 };
 
-export default { create, list, show, remove, update };
+const search = async (ctx) => {
+    return (ctx.body = await movieRepo.searchMovie(ctx.params.title));
+};
+
+export default { create, list, show, remove, update, search };

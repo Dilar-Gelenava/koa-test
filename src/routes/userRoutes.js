@@ -1,15 +1,17 @@
 import dotenv from 'dotenv';
 dotenv.config();
 import Router from 'koa-router';
-const router = new Router();
 import authModule from '../modules/userModule.js';
 const verifyToken = authModule.verifyToken;
+const router = new Router({
+    prefix: '/api',
+});
 
-router.post('/api/register', authModule.register);
+router.post('/register', authModule.register);
 
-router.post('/api/login', authModule.login);
+router.post('/login', authModule.login);
 
-router.post('/api/test', verifyToken, (ctx) => {
+router.post('/test', verifyToken, (ctx) => {
     return (ctx.body = {
         success: true,
         data: ctx.state.authData,

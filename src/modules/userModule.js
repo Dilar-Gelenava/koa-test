@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 import userRepo from '../repo/userRepo.js';
 import userSchema from '../schema/userSchema.js';
-
 import mongo from '../service/mongo.js';
 const getCollection = mongo.getCollection;
 
@@ -12,7 +11,7 @@ const register = async (ctx) => {
     const { value, error } = userSchema.validate(ctx.request.body);
     if (error) {
         ctx.status = 400;
-        return (ctx.body = error.details);
+        return (ctx.body = { success: false, error: error.details[0].message });
     }
 
     const insertedId = await userRepo.createUser(value);
@@ -27,8 +26,7 @@ const login = async (ctx) => {
     const { email, password } = ctx.request.body;
     const user = await getCollection('test', 'user').findOne({ email: email });
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!user || !passwordMatch) {
+    if (!user || !bcrypt.compare(password, user.password)) {
         ctx.status = 401;
         return (ctx.body = {
             success: false,
