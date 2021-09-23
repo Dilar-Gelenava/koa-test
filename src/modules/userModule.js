@@ -6,6 +6,7 @@ import userRepo from '../repo/userRepo.js';
 import userSchema from '../schema/userSchema.js';
 import mongo from '../service/mongo.js';
 const getCollection = mongo.getCollection;
+import util from 'util';
 
 const register = async (ctx) => {
     const { value, error } = userSchema.validate(ctx.request.body);
@@ -26,14 +27,27 @@ const login = async (ctx) => {
     const { email, password } = ctx.request.body;
     const user = await getCollection('test', 'user').findOne({ email: email });
 
-    if (!user || !bcrypt.compare(password, user.password)) {
+    if (user) {
+        const passMatch = await bcrypt.compare(password, user.password);
+        if (passMatch) {
+            const accessToken = jwt.sign(
+                { user },
+                process.env.ACCESS_TOKEN_SECRET
+            );
+            return (ctx.body = { accessToken });
+        } else {
+            ctx.status = 401;
+            return (ctx.body = {
+                success: false,
+                message: 'password is not correct',
+            });
+        }
+    } else {
         ctx.status = 401;
         return (ctx.body = {
             success: false,
+            message: 'email is not correct',
         });
-    } else {
-        const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET);
-        return (ctx.body = { accessToken });
     }
 };
 
@@ -45,21 +59,22 @@ const verifyToken = async (ctx, next) => {
         const bearerToken = bearer[1];
         ctx.request.token = bearerToken;
 
-        jwt.verify(
-            bearerToken,
-            process.env.ACCESS_TOKEN_SECRET,
-            (err, authData) => {
-                if (err) {
-                    ctx.status = 403;
-                    return (ctx.body = {
-                        success: false,
-                    });
-                } else {
-                    ctx.state.authData = authData;
-                    return next();
-                }
-            }
-        );
+        const verify = util.promisify(jwt.verify);
+
+        try {
+            const resp = await verify(
+                bearerToken,
+                process.env.ACCESS_TOKEN_SECRET
+            );
+            ctx.state.authData = resp;
+            await next();
+        } catch (error) {
+            ctx.status = 403;
+            return (ctx.body = {
+                success: false,
+                message: 'please provide valid token',
+            });
+        }
     } else {
         ctx.status = 401;
         return (ctx.body = {

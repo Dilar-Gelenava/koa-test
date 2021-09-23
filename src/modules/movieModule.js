@@ -1,6 +1,9 @@
 import movieRepo from '../repo/movieRepo.js';
-import commentRepo from '../repo/commentRepo.js';
 import movieSchema from '../schema/movieSchema.js';
+
+import mongo from '../service/mongo.js';
+import { ObjectId } from 'mongodb';
+const getCollection = mongo.getCollection;
 
 const create = async (ctx) => {
     const { value, error } = movieSchema.validate(ctx.request.body);
@@ -9,7 +12,7 @@ const create = async (ctx) => {
         return (ctx.body = error.details[0].message);
     }
 
-    value.userId = 1;
+    value.userId = ctx.state.authData.user._id;
 
     const insertedId = await movieRepo.createMovie(value);
     return (ctx.body = {
@@ -27,25 +30,53 @@ const show = async (ctx) => {
 };
 
 const remove = async (ctx) => {
-    await commentRepo.removeMovieComments(ctx.params.id);
-    await movieRepo.removeMovie(ctx.params.id);
-    return (ctx.body = {
-        success: true,
+    const movie = await getCollection('test', 'movie').findOne({
+        _id: new ObjectId(ctx.params.id),
+        userId: ctx.state.authData.user._id,
     });
+
+    if (movie) {
+        await movieRepo.removeMovie(ctx.params.id);
+
+        return (ctx.body = {
+            success: true,
+            message: 'movie deleted successfully',
+        });
+    } else {
+        ctx.status = 403;
+        return (ctx.body = {
+            success: false,
+            message: 'you dont have prermission to delete this movie',
+        });
+    }
 };
 
 const update = async (ctx) => {
-    const { value, error } = movieSchema.validate(ctx.request.body);
-
-    if (error) {
-        ctx.status = 400;
-        return (ctx.body = error.details);
-    }
-
-    movieRepo.updateMovie(ctx.params.id, value);
-    return (ctx.body = {
-        success: true,
+    const movie = await getCollection('test', 'movie').findOne({
+        _id: new ObjectId(ctx.params.id),
+        userId: ctx.state.authData.user._id,
     });
+
+    if (movie) {
+        const { value, error } = movieSchema.validate(ctx.request.body);
+
+        if (error) {
+            ctx.status = 400;
+            return (ctx.body = error.details);
+        }
+
+        movieRepo.updateMovie(ctx.params.id, value);
+        return (ctx.body = {
+            success: true,
+            message: 'movie updated successfully',
+        });
+    } else {
+        ctx.status = 403;
+        return (ctx.body = {
+            success: false,
+            message: 'you dont have prermission to update this movie',
+        });
+    }
 };
 
 const search = async (ctx) => {

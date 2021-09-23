@@ -8,13 +8,13 @@ const router = new Router({
 });
 
 router.get('/movie/list', movieModule.list);
-router.post('/movie/new', movieModule.create);
+router.post('/movie/new', authMW, movieModule.create);
 router.get('/movie/:id', movieModule.show);
-router.delete('/movie/delete/:id', movieModule.remove);
-router.put('/movie/update/:id', movieModule.update);
+router.delete('/movie/delete/:id', authMW, movieModule.remove);
+router.put('/movie/update/:id', authMW, movieModule.update);
 router.get('/movie/search/:title', movieModule.search);
 
-router.post('/movie/comment/new', commentModule.create);
-router.delete('/movie/comment/delete/:id', commentModule.remove);
+router.post('/movie/comment/new', authMW, commentModule.create);
+router.delete('/movie/comment/delete/:id', authMW, commentModule.remove);
 
 export default router.routes();

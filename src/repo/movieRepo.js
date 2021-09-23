@@ -20,6 +20,10 @@ const getMovie = async (id) => {
 };
 
 const removeMovie = async (id) => {
+    await getCollection('test', 'comment').deleteMany({
+        movieId: id,
+    });
+
     await getCollection('test', 'movie').deleteOne({ _id: new ObjectId(id) });
 };
 

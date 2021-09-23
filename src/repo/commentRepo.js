@@ -13,14 +13,7 @@ const removeComment = async (id) => {
     await getCollection('test', 'comment').deleteOne({ _id: new ObjectId(id) });
 };
 
-const removeMovieComments = async (movieId) => {
-    await getCollection('test', 'comment').deleteMany({
-        movieId: movieId,
-    });
-};
-
 export default {
     createComment,
     removeComment,
-    removeMovieComments,
 };
