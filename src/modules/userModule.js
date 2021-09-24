@@ -9,18 +9,18 @@ const getCollection = mongo.getCollection;
 import util from 'util';
 
 const register = async (ctx) => {
-    const { value, error } = userSchema.validate(ctx.request.body);
-    if (error) {
+    try {
+        const value = await userSchema.validateAsync(ctx.request.body);
+        const insertedId = await userRepo.createUser(value);
+
+        return (ctx.body = {
+            success: true,
+            id: insertedId,
+        });
+    } catch (error) {
         ctx.status = 400;
         return (ctx.body = { success: false, error: error.details[0].message });
     }
-
-    const insertedId = await userRepo.createUser(value);
-
-    return (ctx.body = {
-        success: true,
-        id: insertedId,
-    });
 };
 
 const login = async (ctx) => {
