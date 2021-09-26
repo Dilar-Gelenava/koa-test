@@ -22,11 +22,32 @@ const create = async (ctx) => {
 };
 
 const list = async (ctx) => {
-    return (ctx.body = await movieRepo.getMovies());
+    let skip = 0;
+    let limit = 5;
+
+    if (ctx.params.limit && ctx.params.limit >= 1) {
+        limit = +ctx.params.limit;
+    }
+    if (ctx.params.page && ctx.params.page >= 1) {
+        skip = (+ctx.params.page - 1) * limit;
+    }
+
+    const movies = await movieRepo.getMovies(skip, limit);
+
+    return (ctx.body = movies);
 };
 
 const show = async (ctx) => {
-    return (ctx.body = await movieRepo.getMovie(ctx.params.id));
+    if (ObjectId.isValid(ctx.params.id)) {
+        const movie = await movieRepo.getMovie(ctx.params.id);
+
+        if (movie) {
+            movie.ts = movie._id.getTimestamp();
+            return (ctx.body = movie);
+        }
+    }
+
+    return (ctx.status = 400);
 };
 
 const remove = async (ctx) => {
@@ -80,7 +101,10 @@ const update = async (ctx) => {
 };
 
 const search = async (ctx) => {
-    return (ctx.body = await movieRepo.searchMovie(ctx.params.title));
+    if (ctx.params.title) {
+        return (ctx.body = await movieRepo.searchMovie(ctx.params.title));
+    }
+    return (ctx.body = []);
 };
 
 export default { create, list, show, remove, update, search };

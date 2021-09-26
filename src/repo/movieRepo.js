@@ -7,8 +7,13 @@ const createMovie = async (body) => {
     return insertedId;
 };
 
-const getMovies = async () => {
-    const movies = await getCollection('test', 'movie').find().toArray();
+const getMovies = async (skip, limit) => {
+    const movies = await getCollection('test', 'movie')
+        .find()
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(limit)
+        .toArray();
     return movies;
 };
 
@@ -37,6 +42,8 @@ const updateMovie = async (id, body) => {
 const searchMovie = async (title) => {
     const movies = await getCollection('test', 'movie')
         .find({ title: { $regex: `.*${title}.*`, $options: 'i' } })
+        .sort({ _id: -1 })
+        .limit(10)
         .toArray();
     return movies;
 };

@@ -1,15 +1,13 @@
 import koa from 'koa';
 import bodyParser from 'koa-body';
+import v1Router from './routes/v1.js';
 import logger from 'koa-logger';
-import movieRoutes from './routes/movieRoutes.js';
-import authRoutes from './routes/userRoutes.js';
 
 const run = async () => {
     const app = new koa();
 
     app.use(bodyParser());
-    app.use(movieRoutes);
-    app.use(authRoutes);
+    app.use(v1Router.routes());
 
     app.use(logger());
 

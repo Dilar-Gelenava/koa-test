@@ -41,4 +41,19 @@ const remove = async (ctx) => {
     }
 };
 
-export default { create, remove };
+const getMovieComments = async (ctx) => {
+    const comments = await getCollection('test', 'comment')
+        .find({
+            movieId: ctx.params.id,
+        })
+        .sort({ _id: -1 })
+        .toArray();
+
+    comments.forEach((comment) => {
+        comment.ts = comment._id.getTimestamp();
+    });
+
+    return (ctx.body = comments);
+};
+
+export default { create, remove, getMovieComments };

@@ -69,6 +69,7 @@ const verifyToken = async (ctx, next) => {
             ctx.state.authData = resp;
             await next();
         } catch (error) {
+            console.log(error);
             ctx.status = 403;
             return (ctx.body = {
                 success: false,
