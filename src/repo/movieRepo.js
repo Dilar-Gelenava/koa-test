@@ -14,6 +14,22 @@ const getMovies = async (skip, limit) => {
         .skip(skip)
         .limit(limit)
         .toArray();
+
+    return movies;
+};
+
+const getMoviesByIds = async (ids, skip, limit) => {
+    const objIds = ids.map((id) => {
+        return new ObjectId(id);
+    });
+
+    const movies = await getCollection('test', 'movie')
+        .find({ _id: { $in: objIds } })
+        .sort({ _id: -1 })
+        .skip(skip)
+        .limit(limit)
+        .toArray();
+
     return movies;
 };
 
@@ -51,6 +67,7 @@ const searchMovie = async (title) => {
 export default {
     createMovie,
     getMovies,
+    getMoviesByIds,
     getMovie,
     removeMovie,
     updateMovie,

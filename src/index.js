@@ -7,7 +7,7 @@ const run = async () => {
 
         await server.run();
     } catch (err) {
-        logger.error(`Can't start the service: ${err.message}`);
+        console.log(`Can't start the service: ${err.message}`);
 
         throw new Error(`Can't start the service`);
     }

@@ -1,3 +1,4 @@
+import { ObjectId } from 'bson';
 import mongo from '../service/mongo.js';
 const getCollection = mongo.getCollection;
 
@@ -6,11 +7,11 @@ const getWishlist = async (userId) => {
         userId: userId,
     });
 
-    if (wishlist) {
-        return wishlist.movies;
+    if (!wishlist) {
+        return [];
     }
 
-    return [];
+    return wishlist.movies;
 };
 
 const createWish = async (userId, movieId) => {

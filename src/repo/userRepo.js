@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import { ObjectId } from 'bson';
 import mongo from '../service/mongo.js';
 const getCollection = mongo.getCollection;
 
@@ -9,4 +10,16 @@ const createUser = async (body) => {
     return insertedId;
 };
 
-export default { createUser };
+const getUser = async (_id) => {
+    const user = await getCollection('test', 'user').findOne({
+        _id: new ObjectId(_id),
+    });
+
+    if (user) {
+        delete user.password;
+    }
+
+    return user;
+};
+
+export default { createUser, getUser };
